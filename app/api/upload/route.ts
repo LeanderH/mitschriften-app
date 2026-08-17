@@ -16,6 +16,7 @@ export async function POST(request: NextRequest) {
     const subject = formData.get("subject") as string;
     const password = formData.get("password") as string;
     const deletePin = formData.get("deletePin") as string;
+    const author = (formData.get("author") as string) || "Anonym";
 
     // 1. Jahrgangs-Passwort überprüfen
     const expectedCode = process.env.YEAR_ACCESS_CODE || "";
@@ -68,15 +69,15 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    // Heutiges Datum erzeugen (YYYY-MM-DD)
     const currentDate = new Date().toISOString().split("T")[0];
 
-    // 6. In Supabase speichern (inklusive 'date')
+    // 6. In Supabase speichern (inkl. 'date' und 'author_name')
     const { error: dbError } = await supabase.from("notes").insert([
       {
         title,
         subject,
         date: currentDate,
+        author_name: author.trim() || "Anonym",
         mega_url: megaUrl,
         delete_pin: deletePin || null,
       },
