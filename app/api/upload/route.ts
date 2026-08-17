@@ -17,6 +17,7 @@ export async function POST(request: NextRequest) {
     const date = formData.get('date') as string;
     const author = formData.get('author') as string;
     const accessCode = formData.get('accessCode') as string;
+    const deletePin = formData.get("deletePin") as string;
 
     // 1. Jahrgangs-Zugangscode prüfen
     if (accessCode !== process.env.YEAR_ACCESS_CODE) {
@@ -54,6 +55,7 @@ export async function POST(request: NextRequest) {
         date: date || new Date().toISOString().split('T')[0],
         author_name: author || 'Anonym',
         mega_url: megaUrl,
+        delete_pin: deletePin || null,
       },
     ]);
 
