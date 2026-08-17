@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
       password: process.env.MEGA_PASSWORD!,
     }).ready;
 
-    // 4. Upload direkt mit Buffer ausführen (ohne manuelles Stream-Ende)
+    // 4. Upload ausführen
     const uploadedFile: any = await storage.upload(
       {
         name: file.name,
@@ -58,7 +58,6 @@ export async function POST(request: NextRequest) {
       if (typeof uploadedFile.link === "function") {
         uploadedFile.link((err: any, url: string) => {
           if (err || !url) {
-            // Fallback für Promise-basierte Versionen
             Promise.resolve(uploadedFile.link()).then(resolve).catch(reject);
           } else {
             resolve(url);
@@ -69,11 +68,15 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    // 6. In Supabase speichern
+    // Heutiges Datum erzeugen (YYYY-MM-DD)
+    const currentDate = new Date().toISOString().split("T")[0];
+
+    // 6. In Supabase speichern (inklusive 'date')
     const { error: dbError } = await supabase.from("notes").insert([
       {
         title,
         subject,
+        date: currentDate,
         mega_url: megaUrl,
         delete_pin: deletePin || null,
       },
